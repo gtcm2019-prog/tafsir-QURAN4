@@ -268,8 +268,8 @@
     .tooltip .tafsir-text {
       color: #2a2520;
       font-weight: bold;
-      font-size: 24px;
-      margin-top: 8px;
+      font-size: 17px;
+      margin-top: 0px;
       line-height: 1.5;
     }
 
@@ -642,14 +642,12 @@
         // Tooltip
         span.addEventListener("mousemove", (e) => {
           const t = document.getElementById("tooltip");
-          let info = `<div style="font-size: 12px;">Type: <strong>${word.type}</strong>`;
-          if (word.verse_key) info += ` | Verse: <strong>${word.verse_key}</strong></div>`;
-          else info += `</div>`;
+          let info = '';
           
           // Ajouter tafsir si disponible
           if (showTafsir && word.verse_key && tafsirData && tafsirData[word.verse_key]) {
             const tafsir = tafsirData[word.verse_key].text;
-            info += `<div class="tafsir-text">${tafsir}</div>`;
+            info = `<div class="tafsir-text">${tafsir}</div>`;
           }
           
           t.innerHTML = info;
