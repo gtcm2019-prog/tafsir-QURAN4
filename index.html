@@ -8,14 +8,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Lateef:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --border:    #2a3040;
+      --bg:        #f5f1e8;
+      --surface:   #faf7f0;
+      --border:    #e8dcc8;
       --gold:      #c9a84c;
       --gold-dim:  #7a6030;
       --gold-glow: rgba(201,168,76,0.15);
-      --text:      #e8dfc8;
-      --text-dim:  #8b7d60;
+      --text:      #2a2520;
+      --text-dim:  #6b5d47;
       --green:     #1a6b4a;
       --green-light: #2ecc8a;
       --radius:    12px;
@@ -37,13 +37,13 @@
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(1px 1px at 10% 20%, rgba(201,168,76,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 80% 10%, rgba(201,168,76,0.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 30% 70%, rgba(201,168,76,0.2) 0%, transparent 100%),
-        radial-gradient(1px 1px at 90% 80%, rgba(201,168,76,0.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 50% 50%, rgba(201,168,76,0.15) 0%, transparent 100%),
-        radial-gradient(1px 1px at 70% 40%, rgba(201,168,76,0.2) 0%, transparent 100%),
-        radial-gradient(1px 1px at 20% 90%, rgba(201,168,76,0.25) 0%, transparent 100%);
+        radial-gradient(1px 1px at 10% 20%, rgba(201,168,76,0.08) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 10%, rgba(201,168,76,0.06) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 70%, rgba(201,168,76,0.05) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 80%, rgba(201,168,76,0.06) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 40%, rgba(201,168,76,0.04) 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 90%, rgba(201,168,76,0.05) 0%, transparent 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -237,7 +237,7 @@
     /* ── Tooltip ── */
     .tooltip {
       position: fixed;
-      background: #1e2530;
+      background: #faf7f0;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 6px 10px;
@@ -250,6 +250,7 @@
       transition: opacity 0.15s;
       white-space: nowrap;
       direction: ltr;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .tooltip.visible { opacity: 1; }
@@ -529,6 +530,8 @@
   const CDN_DATA  = "https://raw.githubusercontent.com/MohamadHajjRabee/quran-qcf4/main";
   const loadedFonts = new Set();
   let currentPageData = null;
+  let tafsirData = null;
+  let showTafsir = true;
 
   // Populate page select (1–604)
   const sel = document.getElementById("page-select");
@@ -620,6 +623,14 @@
           let info = `type: <strong>${word.type}</strong>`;
           if (word.verse_key) info += ` · verse: <strong>${word.verse_key}</strong>`;
           if (word.text) info += ` · <strong>${word.text}</strong>`;
+          
+          // Ajouter tafsir si disponible
+          if (showTafsir && word.verse_key && tafsirData && tafsirData[word.verse_key]) {
+            const tafsir = tafsirData[word.verse_key].text;
+            const preview = tafsir.substring(0, 80).replace(/\n/g, ' ') + '...';
+            info += `<br><span style="color: var(--gold); font-size: 10px;">📖 ${preview}</span>`;
+          }
+          
           t.innerHTML = info;
           t.style.left = (e.clientX + 12) + "px";
           t.style.top  = (e.clientY + 12) + "px";
@@ -674,7 +685,18 @@
   }
 
   // Load page 1 on start
-  loadPage(1);
+  (async () => {
+    try {
+      const res = await fetch('tafsir/tafsir-muyassar.json');
+      if (res.ok) {
+        tafsirData = await res.json();
+        console.log('✅ Tafsir loaded!', Object.keys(tafsirData).length, 'verses');
+      }
+    } catch(e) {
+      console.warn('⚠️ Tafsir not loaded:', e);
+    }
+    loadPage(1);
+  })();
 </script>
 </body>
 </html>
