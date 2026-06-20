@@ -246,23 +246,32 @@
     .tooltip {
       position: fixed;
       background: #faf7f0;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 10px;
+      border: 2px solid var(--gold);
+      border-radius: 0;
+      padding: 12px 16px;
       font-family: monospace;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-dim);
       pointer-events: none;
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.15s;
-      white-space: nowrap;
-      direction: ltr;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      white-space: normal;
+      direction: rtl;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 300px;
+      word-wrap: break-word;
     }
 
     .tooltip.visible { opacity: 1; }
     .tooltip strong { color: var(--gold); }
+    .tooltip .tafsir-text {
+      color: #2a2520;
+      font-weight: bold;
+      font-size: 24px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
 
     /* ── Loader ── */
     #loader {
@@ -633,20 +642,22 @@
         // Tooltip
         span.addEventListener("mousemove", (e) => {
           const t = document.getElementById("tooltip");
-          let info = `type: <strong>${word.type}</strong>`;
-          if (word.verse_key) info += ` · verse: <strong>${word.verse_key}</strong>`;
-          if (word.text) info += ` · <strong>${word.text}</strong>`;
+          let info = `<div style="font-size: 12px;">Type: <strong>${word.type}</strong>`;
+          if (word.verse_key) info += ` | Verse: <strong>${word.verse_key}</strong></div>`;
+          else info += `</div>`;
           
           // Ajouter tafsir si disponible
           if (showTafsir && word.verse_key && tafsirData && tafsirData[word.verse_key]) {
             const tafsir = tafsirData[word.verse_key].text;
-            const preview = tafsir.substring(0, 80).replace(/\n/g, ' ') + '...';
-            info += `<br><span style="color: var(--gold); font-size: 10px;">📖 ${preview}</span>`;
+            info += `<div class="tafsir-text">${tafsir}</div>`;
           }
           
           t.innerHTML = info;
-          t.style.left = (e.clientX + 12) + "px";
-          t.style.top  = (e.clientY + 12) + "px";
+          
+          // Positionner près du mot (à droite et légèrement au-dessus)
+          const rect = span.getBoundingClientRect();
+          t.style.left = (rect.right + 8) + "px";
+          t.style.top  = (rect.top - 10) + "px";
           t.classList.add("visible");
         });
         span.addEventListener("mouseleave", () => {
