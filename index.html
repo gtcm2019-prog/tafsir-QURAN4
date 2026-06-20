@@ -223,6 +223,14 @@
       font-size: clamp(1.2em, 5vw, 2em);
     }
 
+    .mushaf-word.has-tafsir {
+      text-decoration: underline;
+      text-decoration-color: var(--gold);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+
     .mushaf-word.type-end {
       color: var(--gold-dim);
     }
@@ -616,6 +624,11 @@
         span.className = `mushaf-word type-${word.type}`;
         span.textContent = word.char;
         span.style.fontFamily = `'${word.font}'`;
+
+        // Vérifier si ce verset a une explication dans le tafsir
+        if (showTafsir && word.verse_key && tafsirData && tafsirData[word.verse_key]) {
+          span.classList.add("has-tafsir");
+        }
 
         // Tooltip
         span.addEventListener("mousemove", (e) => {
